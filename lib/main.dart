@@ -4,19 +4,19 @@ import 'screens/main_navigation.dart';
 
 // ==========================================
 // PURPOSE: Application Entry Point
-// Initializes the app and system UI overlays
+// Initializes the app and system UI overlays for a light theme
 // ==========================================
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
   ));
   runApp(const SiteDiscoveryApp());
 }
 
 // ==========================================
 // PURPOSE: Root Application Widget
-// Defines the global dark theme and color palette
+// Defines the global eco-friendly light theme and green palette
 // ==========================================
 class SiteDiscoveryApp extends StatelessWidget {
   const SiteDiscoveryApp({super.key});
@@ -28,54 +28,55 @@ class SiteDiscoveryApp extends StatelessWidget {
       title: 'SiteDiscovery',
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF14141F), // Deep Dark Background
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF8A4FFF), // Vibrant Purple Accent
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF5F7F5), // Soft off-white/gray background
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF135029), // Deep Forest Green (Main Actions)
           onPrimary: Colors.white,
-          surface: Color(0xFF1F1F2E), // Dark Elevated Surface
-          onSurface: Colors.white,
-          secondary: Color(0xFF2D2D3F),
+          surface: Colors.white, // Pure white cards
+          onSurface: Color(0xFF1A1C19), // Dark text
+          secondary: Color(0xFFD6E8D9), // Soft background green
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF14141F),
-          foregroundColor: Colors.white,
+          backgroundColor: Color(0xFFF5F7F5),
+          foregroundColor: Color(0xFF1A1C19),
           centerTitle: true,
           elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8A4FFF),
+            backgroundColor: const Color(0xFF135029),
             foregroundColor: Colors.white,
             elevation: 0,
-            minimumSize: const Size(double.infinity, 56),
+            minimumSize: const Size(double.infinity, 60),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20), // Highly rounded like Fina
             ),
             textStyle: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
             ),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF1F1F2E),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Color(0xFFE0E5E0)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Color(0xFFE0E5E0)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF8A4FFF), width: 2),
+            borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: Color(0xFF135029), width: 2),
           ),
-          labelStyle: const TextStyle(color: Color(0xFF8B8B9D)),
+          labelStyle: const TextStyle(color: Color(0xFF8B938D)),
         ),
       ),
       home: const MainNavigation(),

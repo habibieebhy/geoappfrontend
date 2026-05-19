@@ -5,7 +5,7 @@ import '../services/api_service.dart';
 
 // ==========================================
 // PURPOSE: Site Creation/Verification Form
-// Handles field officer input in a dark-themed step process
+// Handles field officer input in a light, spacious layout
 // ==========================================
 class CreateSiteScreen extends StatefulWidget {
   const CreateSiteScreen({super.key});
@@ -25,7 +25,7 @@ class _CreateSiteScreenState extends State<CreateSiteScreen> {
   String? selectedBrand;
 
   final List<String> constructionStages = ['Excavation', 'Foundation', 'Slab Casting', 'Brickwork', 'Finishing'];
-  final List<String> cementBrands = ['UltraTech', 'Ambuja', 'ACC', 'Shree', 'Dalmia', 'Other'];
+  final List<String> cementBrands = ['EcoCem', 'GreenBuild', 'UltraTech', 'Ambuja', 'Other'];
 
   // ==========================================
   // PURPOSE: Media Handling
@@ -46,30 +46,36 @@ class _CreateSiteScreenState extends State<CreateSiteScreen> {
 
   // ==========================================
   // PURPOSE: Build Form UI
-  // Renders GPS module, image capture, and dropdowns
+  // Renders GPS module, image capture, and dropdowns in light theme
   // ==========================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Site Verification', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+        title: const Text('Verify Site', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              color: const Color(0xFF1F1F2E),
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: const Color(0xFFE8F3E9), borderRadius: BorderRadius.circular(16)),
               child: Row(
                 children: [
-                  const Icon(Icons.gps_fixed, color: Color(0xFF00E676)),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(color: Color(0xFF135029), shape: BoxShape.circle),
+                    child: const Icon(Icons.gps_fixed, color: Colors.white, size: 16),
+                  ),
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('GPS LOCATION ACQUIRED', style: TextStyle(color: Color(0xFF00E676), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                      Text('Lat: 26.1445  Lng: 91.7362 • Kamrup, Assam', style: TextStyle(color: Colors.grey.shade300, fontFamily: 'monospace', fontSize: 13)),
+                      const Text('Location Verified', style: TextStyle(color: Color(0xFF135029), fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text('Lat: 26.1445 Lng: 91.7362 • Kamrup', style: TextStyle(color: const Color(0xFF135029).withOpacity(0.7), fontSize: 12)),
                     ],
                   )
                 ],
@@ -80,66 +86,69 @@ class _CreateSiteScreenState extends State<CreateSiteScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionHeader('1. Visual Verification'),
                   GestureDetector(
                     onTap: pickImage,
                     child: Container(
-                      height: 200,
+                      height: 180,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1F1F2E),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF8A4FFF).withOpacity(0.3), width: 2),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFE0E5E0), width: 2),
                       ),
                       child: imageFile != null
-                          ? ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.file(imageFile!, fit: BoxFit.cover))
+                          ? ClipRRect(borderRadius: BorderRadius.circular(22), child: Image.file(imageFile!, fit: BoxFit.cover))
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.camera_alt, size: 48, color: Color(0xFF8A4FFF)),
-                                SizedBox(height: 12),
-                                Text('Capture Geotagged Photo', style: TextStyle(color: Color(0xFF8A4FFF), fontWeight: FontWeight.bold)),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: const BoxDecoration(color: Color(0xFFF5F7F5), shape: BoxShape.circle),
+                                  child: const Icon(Icons.camera_alt, size: 32, color: Color(0xFF135029)),
+                                ),
+                                const SizedBox(height: 12),
+                                const Text('Capture Site Photo', style: TextStyle(color: Color(0xFF1A1C19), fontWeight: FontWeight.bold)),
                               ],
                             ),
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('2. Site Details'),
+                  _buildSectionHeader('Construction Details'),
                   DropdownButtonFormField<String>(
-                    dropdownColor: const Color(0xFF2D2D3F),
-                    decoration: const InputDecoration(labelText: 'Stage of Construction', prefixIcon: Icon(Icons.architecture, color: Color(0xFF8B8B9D))),
+                    dropdownColor: Colors.white,
+                    decoration: const InputDecoration(labelText: 'Stage of Construction'),
                     value: selectedStage,
-                    items: constructionStages.map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(color: Colors.white)))).toList(),
+                    items: constructionStages.map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(color: Color(0xFF1A1C19))))).toList(),
                     onChanged: (val) => setState(() => selectedStage = val),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    dropdownColor: const Color(0xFF2D2D3F),
-                    decoration: const InputDecoration(labelText: 'Current Cement Brand', prefixIcon: Icon(Icons.business, color: Color(0xFF8B8B9D))),
+                    dropdownColor: Colors.white,
+                    decoration: const InputDecoration(labelText: 'Current Cement Brand'),
                     value: selectedBrand,
-                    items: cementBrands.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(color: Colors.white)))).toList(),
+                    items: cementBrands.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(color: Color(0xFF1A1C19))))).toList(),
                     onChanged: (val) => setState(() => selectedBrand = val),
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('3. Contractor Info'),
+                  _buildSectionHeader('Contractor Info'),
                   TextField(
                     controller: ownerController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: 'Contractor / Owner Name', prefixIcon: Icon(Icons.person, color: Color(0xFF8B8B9D))),
+                    style: const TextStyle(color: Color(0xFF1A1C19)),
+                    decoration: const InputDecoration(labelText: 'Contractor Name'),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone, color: Color(0xFF8B8B9D))),
+                    style: const TextStyle(color: Color(0xFF1A1C19)),
+                    decoration: const InputDecoration(labelText: 'Phone Number'),
                   ),
                   const SizedBox(height: 48),
                   ElevatedButton(
                     onPressed: loading ? null : submit,
                     child: loading 
                         ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                        : const Text('SUBMIT VERIFICATION'),
+                        : const Text('Confirm Verification'),
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -155,8 +164,8 @@ class _CreateSiteScreenState extends State<CreateSiteScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
-        title.toUpperCase(),
-        style: const TextStyle(color: Color(0xFF8B8B9D), fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.2),
+        title,
+        style: const TextStyle(color: Color(0xFF1A1C19), fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }

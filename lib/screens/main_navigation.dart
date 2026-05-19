@@ -26,10 +26,10 @@ class _MainNavigationState extends State<MainNavigation> {
     super.initState();
     _screens = [
       const HomeScreen(),
-      const Scaffold(body: Center(child: Text('Map View - Coming Soon'))),
+      const Scaffold(body: Center(child: Text('Map View - Coming Soon', style: TextStyle(color: Colors.black)))),
       const SiteListScreen(), 
-      const Scaffold(body: Center(child: Text('Leads - Coming Soon'))),
-      const Scaffold(body: Center(child: Text('Profile - Coming Soon'))),
+      const Scaffold(body: Center(child: Text('Leads - Coming Soon', style: TextStyle(color: Colors.black)))),
+      const Scaffold(body: Center(child: Text('Profile - Coming Soon', style: TextStyle(color: Colors.black)))),
     ];
   }
 
@@ -46,20 +46,23 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, -5))
+          ],
         ),
         child: NavigationBar(
           selectedIndex: _currentIndex,
           onDestinationSelected: (index) => setState(() => _currentIndex = index),
-          backgroundColor: const Color(0xFF14141F),
-          indicatorColor: const Color(0xFF8A4FFF).withOpacity(0.2),
-          height: 70,
+          backgroundColor: Colors.white,
+          indicatorColor: const Color(0xFFD6E8D9), // Soft green indicator
+          height: 80,
           destinations: const [
-            NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard, color: Color(0xFF8A4FFF)), label: 'Home'),
-            NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map, color: Color(0xFF8A4FFF)), label: 'Map'),
-            NavigationDestination(icon: Icon(Icons.assignment_outlined), selectedIcon: Icon(Icons.assignment, color: Color(0xFF8A4FFF)), label: 'Tasks'),
-            NavigationDestination(icon: Icon(Icons.radar_outlined), selectedIcon: Icon(Icons.radar, color: Color(0xFF8A4FFF)), label: 'Leads'),
-            NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person, color: Color(0xFF8A4FFF)), label: 'Profile'),
+            NavigationDestination(icon: Icon(Icons.home_outlined, color: Colors.grey), selectedIcon: Icon(Icons.home, color: Color(0xFF135029)), label: 'Home'),
+            NavigationDestination(icon: Icon(Icons.insert_chart_outlined, color: Colors.grey), selectedIcon: Icon(Icons.insert_chart, color: Color(0xFF135029)), label: 'Analytic'),
+            NavigationDestination(icon: Icon(Icons.qr_code_scanner, color: Colors.grey), selectedIcon: Icon(Icons.qr_code_scanner, color: Color(0xFF135029)), label: 'Scan'),
+            NavigationDestination(icon: Icon(Icons.assignment_outlined, color: Colors.grey), selectedIcon: Icon(Icons.assignment, color: Color(0xFF135029)), label: 'Tasks'),
+            NavigationDestination(icon: Icon(Icons.person_outline, color: Colors.grey), selectedIcon: Icon(Icons.person, color: Color(0xFF135029)), label: 'Profile'),
           ],
         ),
       ),
