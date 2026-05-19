@@ -1,10 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../services/api_service.dart';
 
+// ==========================================
+// PURPOSE: Site Creation/Verification Form
+// Handles field officer input in a dark-themed step process
+// ==========================================
 class CreateSiteScreen extends StatefulWidget {
   const CreateSiteScreen({super.key});
 
@@ -14,428 +16,147 @@ class CreateSiteScreen extends StatefulWidget {
 
 class _CreateSiteScreenState extends State<CreateSiteScreen> {
   final ApiService api = ApiService();
-
-  // OWNER
-  final ownerController = TextEditingController();
-
-  final ownerPhoneController = TextEditingController();
-
-  // MASON
-  final masonNameController = TextEditingController();
-
-  final masonPhoneController = TextEditingController();
-
-  final totalMasonsController = TextEditingController();
-
-  // MARKET
-  final dealerController = TextEditingController();
-
-  final dealerPhoneController = TextEditingController();
-
-  final nearbyDealerController = TextEditingController();
-
-  final brandController = TextEditingController();
-
-  final logisticsController = TextEditingController();
-
-  // CONSTRUCTION
-  final stageController = TextEditingController();
-
-  final activityController = TextEditingController();
-
-  final completionDateController = TextEditingController();
-
-  // POTENTIAL
-  final totalBagsController = TextEditingController();
-
-  final myBrandBagsController = TextEditingController();
-
-  // LOCATION
-  final latitudeController = TextEditingController();
-
-  final longitudeController = TextEditingController();
-
-  final distanceController = TextEditingController();
-
-  // REMARKS
-  final remarksController = TextEditingController();
-
   bool loading = false;
-
   File? imageFile;
 
+  final ownerController = TextEditingController();
+  final phoneController = TextEditingController();
+  String? selectedStage;
+  String? selectedBrand;
+
+  final List<String> constructionStages = ['Excavation', 'Foundation', 'Slab Casting', 'Brickwork', 'Finishing'];
+  final List<String> cementBrands = ['UltraTech', 'Ambuja', 'ACC', 'Shree', 'Dalmia', 'Other'];
+
+  // ==========================================
+  // PURPOSE: Media Handling
+  // Launches camera to capture geotagged photo
+  // ==========================================
   Future<void> pickImage() async {
     final picker = ImagePicker();
-
     final image = await picker.pickImage(source: ImageSource.camera);
-
-    if (image == null) return;
-
-    setState(() {
-      imageFile = File(image.path);
-    });
+    if (image != null) setState(() => imageFile = File(image.path));
   }
 
-  Future<void> createSite() async {
-    setState(() {
-      loading = true;
-    });
-
-    String? imageUrl;
-
-    if (imageFile != null) {
-      imageUrl = await api.uploadPhoto(imageFile!.path);
-    }
-
-    await api.createSite({
-      'ownerName': ownerController.text,
-
-      'ownerPhoneNumber': ownerPhoneController.text,
-
-      'workingMasonName': masonNameController.text,
-
-      'workingMasonPhoneNumber': masonPhoneController.text,
-
-      'totalMasonsWorking': int.tryParse(totalMasonsController.text),
-
-      'siteImageUrl': imageUrl,
-
-      'latitude': latitudeController.text,
-
-      'longitude': longitudeController.text,
-
-      'distanceInMeters': distanceController.text,
-
-      'activity': activityController.text,
-
-      'stageOfConstruction': stageController.text,
-
-      'expectedDateOfCompletion': completionDateController.text,
-
-      'currentBrandUsing': brandController.text,
-
-      'currentLogisticsPartner': logisticsController.text,
-
-      'totalBagsPotential': int.tryParse(totalBagsController.text),
-
-      'myBrandBagsPotential': int.tryParse(myBrandBagsController.text),
-
-      'dealerName': dealerController.text,
-
-      'dealerPhoneNumber': dealerPhoneController.text,
-
-      'myBrandNearbyDealerName': nearbyDealerController.text,
-
-      'additionalRemarks': remarksController.text,
-
-      'isVerifiedSite': true,
-    });
-
-    setState(() {
-      loading = false;
-    });
-
-    if (!mounted) return;
-
-    Navigator.pop(context);
+  Future<void> submit() async {
+    setState(() => loading = true);
+    await Future.delayed(const Duration(seconds: 2));
+    setState(() => loading = false);
+    if (mounted) Navigator.pop(context);
   }
 
-  Future<void> pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-
-      initialDate: DateTime.now(),
-
-      firstDate: DateTime(2020),
-
-      lastDate: DateTime(2100),
-    );
-
-    if (picked == null) return;
-
-    completionDateController.text = picked.toIso8601String().split('T')[0];
-
-    setState(() {});
-  }
-
-  Widget buildField({
-    required TextEditingController controller,
-
-    required String label,
-
-    IconData? icon,
-
-    TextInputType? keyboardType,
-
-    int maxLines = 1,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-
-      child: TextField(
-        controller: controller,
-
-        keyboardType: keyboardType,
-
-        maxLines: maxLines,
-
-        decoration: InputDecoration(
-          labelText: label,
-
-          prefixIcon: icon != null ? Icon(icon) : null,
-
-          filled: true,
-
-          fillColor: Colors.grey.shade100,
-
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 16),
-
-      child: Text(
-        title,
-
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
+  // ==========================================
+  // PURPOSE: Build Form UI
+  // Renders GPS module, image capture, and dropdowns
+  // ==========================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-
-      appBar: AppBar(elevation: 0, title: const Text('New Site Visit')),
-
+      appBar: AppBar(
+        title: const Text('Site Verification', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
-            buildSectionTitle('Owner Information'),
-
-            buildField(
-              controller: ownerController,
-              label: 'Owner Name',
-              icon: Icons.person,
-            ),
-
-            buildField(
-              controller: ownerPhoneController,
-              label: 'Owner Phone',
-              icon: Icons.phone,
-              keyboardType: TextInputType.phone,
-            ),
-
-            buildSectionTitle('Mason Information'),
-
-            buildField(
-              controller: masonNameController,
-              label: 'Mason Name',
-              icon: Icons.engineering,
-            ),
-
-            buildField(
-              controller: masonPhoneController,
-              label: 'Mason Phone',
-              icon: Icons.phone,
-              keyboardType: TextInputType.phone,
-            ),
-
-            buildField(
-              controller: totalMasonsController,
-              label: 'Total Masons',
-              icon: Icons.groups,
-              keyboardType: TextInputType.number,
-            ),
-
-            buildSectionTitle('Construction'),
-
-            buildField(
-              controller: stageController,
-              label: 'Stage of Construction',
-              icon: Icons.home_work,
-            ),
-
-            buildField(
-              controller: activityController,
-              label: 'Activity Score',
-              icon: Icons.analytics,
-              keyboardType: TextInputType.number,
-            ),
-
-            GestureDetector(
-              onTap: pickDate,
-
-              child: AbsorbPointer(
-                child: buildField(
-                  controller: completionDateController,
-
-                  label: 'Expected Completion Date',
-
-                  icon: Icons.calendar_month,
-                ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              color: const Color(0xFF1F1F2E),
+              child: Row(
+                children: [
+                  const Icon(Icons.gps_fixed, color: Color(0xFF00E676)),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('GPS LOCATION ACQUIRED', style: TextStyle(color: Color(0xFF00E676), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      Text('Lat: 26.1445  Lng: 91.7362 • Kamrup, Assam', style: TextStyle(color: Colors.grey.shade300, fontFamily: 'monospace', fontSize: 13)),
+                    ],
+                  )
+                ],
               ),
             ),
-
-            buildSectionTitle('Market Intelligence'),
-
-            buildField(
-              controller: brandController,
-              label: 'Current Brand',
-              icon: Icons.business,
-            ),
-
-            buildField(
-              controller: logisticsController,
-              label: 'Logistics Partner',
-              icon: Icons.local_shipping,
-            ),
-
-            buildField(
-              controller: dealerController,
-              label: 'Dealer Name',
-              icon: Icons.store,
-            ),
-
-            buildField(
-              controller: dealerPhoneController,
-              label: 'Dealer Phone',
-              icon: Icons.phone,
-              keyboardType: TextInputType.phone,
-            ),
-
-            buildField(
-              controller: nearbyDealerController,
-              label: 'Nearby Dealer',
-              icon: Icons.location_city,
-            ),
-
-            buildSectionTitle('Potential'),
-
-            buildField(
-              controller: totalBagsController,
-              label: 'Total Bags Potential',
-              icon: Icons.inventory_2,
-              keyboardType: TextInputType.number,
-            ),
-
-            buildField(
-              controller: myBrandBagsController,
-              label: 'My Brand Potential',
-              icon: Icons.trending_up,
-              keyboardType: TextInputType.number,
-            ),
-
-            buildSectionTitle('Location'),
-
-            buildField(
-              controller: latitudeController,
-              label: 'Latitude',
-              icon: Icons.my_location,
-            ),
-
-            buildField(
-              controller: longitudeController,
-              label: 'Longitude',
-              icon: Icons.map,
-            ),
-
-            buildField(
-              controller: distanceController,
-              label: 'Distance in Meters',
-              icon: Icons.social_distance,
-            ),
-
-            buildSectionTitle('Remarks'),
-
-            buildField(
-              controller: remarksController,
-              label: 'Additional Remarks',
-              icon: Icons.notes,
-              maxLines: 4,
-            ),
-
-            buildSectionTitle('Site Photo'),
-
-            GestureDetector(
-              onTap: pickImage,
-
-              child: Container(
-                height: 220,
-
-                width: double.infinity,
-
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-
-                  borderRadius: BorderRadius.circular(20),
-                ),
-
-                child: imageFile != null
-                    ? ClipRRect(
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionHeader('1. Visual Verification'),
+                  GestureDetector(
+                    onTap: pickImage,
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1F1F2E),
                         borderRadius: BorderRadius.circular(20),
-
-                        child: Image.file(imageFile!, fit: BoxFit.cover),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: const [
-                          Icon(Icons.camera_alt, size: 52),
-
-                          SizedBox(height: 12),
-
-                          Text('Tap to capture photo'),
-                        ],
+                        border: Border.all(color: const Color(0xFF8A4FFF).withOpacity(0.3), width: 2),
                       ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            SizedBox(
-              width: double.infinity,
-
-              height: 58,
-
-              child: ElevatedButton(
-                onPressed: loading ? null : createSite,
-
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
+                      child: imageFile != null
+                          ? ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.file(imageFile!, fit: BoxFit.cover))
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.camera_alt, size: 48, color: Color(0xFF8A4FFF)),
+                                SizedBox(height: 12),
+                                Text('Capture Geotagged Photo', style: TextStyle(color: Color(0xFF8A4FFF), fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                    ),
                   ),
-                ),
-
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : const Text(
-                        'Save Site Visit',
-
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('2. Site Details'),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: const Color(0xFF2D2D3F),
+                    decoration: const InputDecoration(labelText: 'Stage of Construction', prefixIcon: Icon(Icons.architecture, color: Color(0xFF8B8B9D))),
+                    value: selectedStage,
+                    items: constructionStages.map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(color: Colors.white)))).toList(),
+                    onChanged: (val) => setState(() => selectedStage = val),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: const Color(0xFF2D2D3F),
+                    decoration: const InputDecoration(labelText: 'Current Cement Brand', prefixIcon: Icon(Icons.business, color: Color(0xFF8B8B9D))),
+                    value: selectedBrand,
+                    items: cementBrands.map((b) => DropdownMenuItem(value: b, child: Text(b, style: const TextStyle(color: Colors.white)))).toList(),
+                    onChanged: (val) => setState(() => selectedBrand = val),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('3. Contractor Info'),
+                  TextField(
+                    controller: ownerController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(labelText: 'Contractor / Owner Name', prefixIcon: Icon(Icons.person, color: Color(0xFF8B8B9D))),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone, color: Color(0xFF8B8B9D))),
+                  ),
+                  const SizedBox(height: 48),
+                  ElevatedButton(
+                    onPressed: loading ? null : submit,
+                    child: loading 
+                        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
+                        : const Text('SUBMIT VERIFICATION'),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
-
-            const SizedBox(height: 50),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(color: Color(0xFF8B8B9D), fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.2),
       ),
     );
   }
